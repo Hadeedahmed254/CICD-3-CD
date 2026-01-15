@@ -60,18 +60,18 @@ spec:
     metadata:
       labels:
         app: mysql
-spec:
-  containers:
-    - image: mysql:8
-      name: mysql
-      resources:
-        requests:
-          memory: "512Mi"
-          cpu: "500m"
-        limits:
-          memory: "1Gi"
-          cpu: "1"
-      env:
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+        env:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -82,26 +82,26 @@ spec:
             configMapKeyRef:
               name: mysql-config
               key: MYSQL_DATABASE
-      ports:
+        ports:
         - containerPort: 3306
           name: mysql
-      volumeMounts:
+        volumeMounts:
         - mountPath: /var/lib/mysql
           name: mysql-data
-      livenessProbe:
-        tcpSocket:
-          port: 3306
-        initialDelaySeconds: 30
-        periodSeconds: 10
-      readinessProbe:
-        exec:
-          command: ["mysqladmin", "ping", "-h", "127.0.0.1"]
-        initialDelaySeconds: 30
-        periodSeconds: 10
-  volumes:
-    - name: mysql-data
-      persistentVolumeClaim:
-        claimName: mysql-pvc
+        livenessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command: ["mysqladmin", "ping", "-h", "127.0.0.1"]
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: mysql-pvc
 ---
 # MySQL Service
 apiVersion: v1
@@ -154,23 +154,23 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: MYSQL_ROOT_PASSWORD
-      livenessProbe:
-        httpGet:
-          path: /login
-          port: 8080
-        initialDelaySeconds: 60
-        timeoutSeconds: 5
-        periodSeconds: 10
-        failureThreshold: 3
-      readinessProbe:
-        httpGet:
-          path: /login
-          port: 8080
-        initialDelaySeconds: 60
-        timeoutSeconds: 5
-        periodSeconds: 10
-        failureThreshold: 3
-...
+        livenessProbe:
+          httpGet:
+            path: /login
+            port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /login
+            port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+---
 # BankApp Service
 apiVersion: v1
 kind: Service
